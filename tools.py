@@ -75,15 +75,49 @@ class Ray:
 
         #Escolha se a primeira interceção é com o eixo vertical ou horizontal, offset do sitio em que a textura da parede é intercetada
         if depth_vert < depth_hor:
-            self.depth, texture = depth_vert, texture_vert
+            self.depth, texture, wall_pos = depth_vert, texture_vert, Vector2(tile_vert)
             y_vert %= 1
             self.offset = y_vert if cos_a > 0 else (1 - y_vert)
+            if wall_pos.y > oy:
+                wall_angle = 270
+            else:
+                wall_angle = 90
         else:
-            self.depth, texture = depth_hor, texture_hor
+            self.depth, texture, wall_pos = depth_hor, texture_hor, Vector2(tile_hor)
             x_hor %= 1
             self.offset = (1 - x_hor) if sin_a > 0 else x_hor
-        self.depth *= math.cos(self.game.player.rad_angle - angle)  # Correção do efeito fishbowl
+            if wall_pos.x > ox:
+                wall_angle = 0
+            else:
+                wall_angle = 180
+        if DIMENSION == 3:
+            self.depth *= math.cos(self.game.player.rad_angle - angle)  # Correção do efeito fishbowl
         self.hit_point = Vector2(ox + self.depth * cos_a, oy + self.depth * sin_a) * map.WALL_SIZE#Interceção
         self.proj_height = SCREEN_DIST / (self.depth + 0.0001)#Altura
-        self.color_value = 255 / (1 + (abs(self.depth) ** 5) * 0.03)#Cor
+        self.color_value = 255 / (1 + (abs(self.depth) ** 3) * 0.03)#Cor
+        pygame.draw.line(self.game.screen, 'orange', (pos.x, pos.y), (pos.x + 100 * self.depth * cos_a, pos.y + 100 * self.depth * sin_a), 2)
+        if texture >= 20:
+            wall_pos = cord_to_pos(wall_pos)
+            point = wall_pos - self.hit_point
+            self.portal(texture, angle, point, wall_angle)
+
+    #https://www.cs.rpi.edu/~cutler/classes/advancedgraphics/S19/final_projects/max_sol.pdf
+    def portal(self, num, angle, hit_point, wall_angle):
+        map_walls = self.game.map.wall_cords
+        for i in map_walls:
+            if map_walls[i] >= 20:
+                if map_walls[i] != num and str(map_walls[i])[1] == str(num)[1]:
+                    wall_cords = i
+                    wall_num = map_walls[i]
+
+        match str(wall_num)[0]:
+            case "2":
+                self.ray_cast(cord_to_pos(wall_cords) + Vector2(0, map.WALL_SIZE/2) + Vector2(0, hit_point.y), angle + (wall_angle))
+            case "3":
+                self.ray_cast(cord_to_pos(wall_cords) - Vector2(0, map.WALL_SIZE/2) + Vector2(0, hit_point.y), angle + (wall_angle - math.radians(180)))
+            case "4":
+                self.ray_cast(cord_to_pos(wall_cords) - Vector2(0, map.WALL_SIZE/2) + Vector2(hit_point.x, 0), angle + (wall_angle - math.radians(270)))
+            case "5":
+                self.ray_cast(cord_to_pos(wall_cords) + Vector2(0, map.WALL_SIZE/2) + Vector2(hit_point.x, 0), angle + (wall_angle - math.radians(90)))
+
 

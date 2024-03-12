@@ -114,9 +114,10 @@ class Player(pygame.sprite.Sprite):
     def draw_player(self):
         pygame.draw.circle(self.game.screen, (200, 200, 200), self.pos, 20)
         #pygame.draw.line(self.game.screen, 'yellow', (self.pos.x, self.pos.y), Vector2(math.cos(self.rad_angle), math.sin(self.rad_angle)) * WALL_SIZE + self.pos, 2)
-        for i in range(NUM_RAYS):
-            pygame.draw.line(self.game.screen, 'orange', (self.pos.x, self.pos.y), self.lines_pos[i], 2)
+        #for i in range(NUM_RAYS):
+        #    pygame.draw.line(self.game.screen, 'orange', (self.pos.x, self.pos.y), self.lines_pos[i], 2)
 
     def draw_vision(self):
         for i in range(NUM_RAYS):
             pygame.draw.rect(self.game.screen, (self.rays[i].color_value, self.rays[i].color_value, self.rays[i].color_value),(i * SCALE, HALF_HEIGHT - self.rays[i].proj_height // 2, SCALE, self.rays[i].proj_height))
+
