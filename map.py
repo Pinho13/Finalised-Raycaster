@@ -16,7 +16,7 @@ map_struct = [
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [41, 0, 0, 0, 0, 0, 0, 0, 0, 51],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -49,16 +49,19 @@ class Map:
 
     def build_map(self):
         for cord in self.wall_cords:
-            walls_group.add(Wall(cord_to_pos(cord)))
+            if self.wall_cords[cord] < 10:
+                walls_group.add(Wall(cord_to_pos(cord), "white"))
+            else:
+                walls_group.add(Wall(cord_to_pos(cord), "black"))
 
 
 class Wall(pygame.sprite.Sprite):
-    def __init__(self, pos):
+    def __init__(self, pos, color):
         super().__init__()
         self.pos = pos
         self.size = (WALL_SIZE, WALL_SIZE)
         self.image = pygame.Surface(self.size)
-        self.image.fill((255, 255, 255))
+        self.image.fill(color)
         self.rect = self.image.get_rect(center=self.pos)
         collision_objects.append(self.rect)
 
