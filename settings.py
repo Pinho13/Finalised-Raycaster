@@ -1,5 +1,4 @@
 import math
-
 #Window
 RES = WIDTH, HEIGHT = (1600, 1000)
 HALF_WIDTH = WIDTH // 2
