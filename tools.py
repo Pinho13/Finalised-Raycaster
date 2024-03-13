@@ -78,19 +78,19 @@ class Ray:
             self.depth, texture, wall_pos = depth_vert, texture_vert, Vector2(tile_vert)
             y_vert %= 1
             self.offset = y_vert if cos_a > 0 else (1 - y_vert)
-            if wall_pos.y > oy:
-                wall_angle = 270
+            if wall_pos.x < ox:
+                wall_angle = 0
             else:
-                wall_angle = 90
+                wall_angle = 180
             portal_offset = "y"
         else:
             self.depth, texture, wall_pos = depth_hor, texture_hor, Vector2(tile_hor)
             x_hor %= 1
             self.offset = (1 - x_hor) if sin_a > 0 else x_hor
-            if wall_pos.x > ox:
-                wall_angle = 0
+            if wall_pos.y < oy:
+                wall_angle = 270
             else:
-                wall_angle = 180
+                wall_angle = 90
             portal_offset = "x"
         if DIMENSION == 3:
             self.depth += additional_depth
@@ -126,16 +126,20 @@ class Ray:
         match str(wall_num)[0]:
             case "2":
                 self.ray_cast(wall_pos + Vector2(map.WALL_SIZE/2, point), alpha_angle, self.depth)
-                pygame.draw.circle(self.game.screen, (200, 200, 200), wall_pos + Vector2(map.WALL_SIZE/2, point), 4)
+                if DIMENSION == 2:
+                    pygame.draw.circle(self.game.screen, (200, 200, 200), wall_pos + Vector2(map.WALL_SIZE/2, point), 4)
             case "3":
                 self.ray_cast(wall_pos + Vector2(-map.WALL_SIZE/2, point), alpha_angle + math.radians(180), self.depth)
-                pygame.draw.circle(self.game.screen, (200, 200, 200), wall_pos + Vector2(-map.WALL_SIZE/2, point), 4)
+                if DIMENSION == 2:
+                    pygame.draw.circle(self.game.screen, (200, 200, 200), wall_pos + Vector2(-map.WALL_SIZE/2, point), 4)
             case "4":
                 self.ray_cast(wall_pos + Vector2(point, map.WALL_SIZE/2), alpha_angle + math.radians(270), self.depth)
-                pygame.draw.circle(self.game.screen, (200, 200, 200), wall_pos + Vector2(point, map.WALL_SIZE/2), 4)
+                if DIMENSION == 2:
+                    pygame.draw.circle(self.game.screen, (200, 200, 200), wall_pos + Vector2(point, map.WALL_SIZE/2), 4)
             case "5":
                 self.ray_cast(wall_pos + Vector2(point, -map.WALL_SIZE/2), alpha_angle + math.radians(90), self.depth)
-                pygame.draw.circle(self.game.screen, (200, 200, 200), wall_pos + Vector2(point, -map.WALL_SIZE/2), 4)
+                if DIMENSION == 2:
+                    pygame.draw.circle(self.game.screen, (200, 200, 200), wall_pos + Vector2(point, -map.WALL_SIZE/2), 4)
 
 
 
