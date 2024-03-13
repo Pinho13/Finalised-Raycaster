@@ -106,7 +106,7 @@ class Player(pygame.sprite.Sprite):
     def ray_casting(self):
         angle = self.rad_angle - HALF_FOV + 0.0001
         for i in range(NUM_RAYS):
-            self.rays[i].ray_cast(self.pos, angle)
+            self.rays[i].ray_cast(self.pos, angle, 0, angle - self.rad_angle)
             if DIMENSION == 2:
                 self.lines_pos[i] = self.rays[i].hit_point
             angle += DELTA_ANGLE

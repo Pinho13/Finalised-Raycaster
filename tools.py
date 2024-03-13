@@ -32,7 +32,7 @@ class Ray:
         self.color_value = 0
         self.hit_point = Vector2(0, 0)
 
-    def ray_cast(self, pos, angle, additional_depth = 0):
+    def ray_cast(self, pos, angle, additional_depth = 0, alpha = 0):
         ox, oy = pos/map.WALL_SIZE
         sin_a = math.sin(angle)
         cos_a = math.cos(angle)
@@ -94,7 +94,9 @@ class Ray:
             portal_offset = "x"
         if DIMENSION == 3:
             self.depth += additional_depth
-        no_fish_depth = self.depth * math.cos(self.game.player.rad_angle - angle)  # Correção do efeito fishbowl
+        no_fish_depth = self.depth * math.cos(-alpha)  # Correção do efeito fishbowl
+        if DIMENSION == 3:
+            self.depth = no_fish_depth
         self.hit_point = Vector2(ox + self.depth * cos_a, oy + self.depth * sin_a) * map.WALL_SIZE#Interceção
         self.proj_height = SCREEN_DIST / (self.depth + 0.0001)#Altura
         self.color_value = 255 / (1 + (abs(self.depth) ** 1) * 0.03)#Cor
@@ -107,13 +109,10 @@ class Ray:
                 portal_offset = -point.x
             else:
                 portal_offset = -point.y
-            self.portal(texture, angle, portal_offset, wall_angle)
-
-        if DIMENSION == 3:
-            self.depth = no_fish_depth
+            self.portal(texture, angle, portal_offset, wall_angle, alpha)
 
     #https://www.cs.rpi.edu/~cutler/classes/advancedgraphics/S19/final_projects/max_sol.pdf
-    def portal(self, num, angle, point, wall_angle):
+    def portal(self, num, angle, point, wall_angle, alpha):
         map_walls = self.game.map.wall_cords
         for i in map_walls:
             if map_walls[i] >= 20:
@@ -125,21 +124,21 @@ class Ray:
         wall_pos = Vector2(cord_to_pos(wall_cords))
         match str(wall_num)[0]:
             case "2":
-                self.ray_cast(wall_pos + Vector2(map.WALL_SIZE/2, point), alpha_angle, self.depth)
+                self.ray_cast(wall_pos + Vector2(map.WALL_SIZE/2, point), alpha_angle, self.depth, alpha)
                 if DIMENSION == 2:
                     pygame.draw.circle(self.game.screen, (200, 200, 200), wall_pos + Vector2(map.WALL_SIZE/2, point), 4)
             case "3":
-                self.ray_cast(wall_pos + Vector2(-map.WALL_SIZE/2, point), alpha_angle + math.radians(180), self.depth)
+                self.ray_cast(wall_pos + Vector2(-map.WALL_SIZE/2, point), alpha_angle + math.radians(180), self.depth, alpha)
                 if DIMENSION == 2:
                     pygame.draw.circle(self.game.screen, (200, 200, 200), wall_pos + Vector2(-map.WALL_SIZE/2, point), 4)
             case "4":
-                self.ray_cast(wall_pos + Vector2(point, map.WALL_SIZE/2), alpha_angle + math.radians(270), self.depth)
+                self.ray_cast(wall_pos + Vector2(point, map.WALL_SIZE/2), alpha_angle + math.radians(270), self.depth, alpha)
                 if DIMENSION == 2:
-                    pygame.draw.circle(self.game.screen, (200, 200, 200), wall_pos + Vector2(point, map.WALL_SIZE/2), 4)
+                    pygame.draw.circle(self.game.screen, (200, 200, 200), wall_pos + Vector2(point, map.WALL_SIZE/2), 4, alpha)
             case "5":
                 self.ray_cast(wall_pos + Vector2(point, -map.WALL_SIZE/2), alpha_angle + math.radians(90), self.depth)
                 if DIMENSION == 2:
-                    pygame.draw.circle(self.game.screen, (200, 200, 200), wall_pos + Vector2(point, -map.WALL_SIZE/2), 4)
+                    pygame.draw.circle(self.game.screen, (200, 200, 200), wall_pos + Vector2(point, -map.WALL_SIZE/2), 4, alpha)
 
 
 
