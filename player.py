@@ -15,6 +15,7 @@ class Player(pygame.sprite.Sprite):
         self.pos = Vector2(PLAYER_POS)
         self.angle = PLAYER_ANGLE
         self.rad_angle = math.radians(self.angle)
+        self.rounded_angle = PLAYER_ANGLE
         self.health = PLAYER_MAX_HEALTH
             #physics
         self.dir = Vector2(0, 0)
@@ -81,6 +82,25 @@ class Player(pygame.sprite.Sprite):
         if self.angle < 0:
             self.angle = 360 + self.angle
 
+        match int(self.angle/100):
+            case 0:
+                if self.angle > 90:
+                    self.rounded_angle = self.angle - 90
+                else:
+                    self.rounded_angle = self.angle
+            case 1:
+                if self.angle > 180:
+                    self.rounded_angle = self.angle - 180
+                else:
+                    self.rounded_angle = self.angle - 90
+            case 2:
+                if self.angle > 270:
+                    self.rounded_angle = self.angle - 270
+                else:
+                    self.rounded_angle = self.angle - 180
+            case 3:
+                self.rounded_angle = self.angle - 270
+
     def check_wall(self):
         if self.dir == Vector2(0, 0):
             col_dir = Vector2(0, 0)
@@ -89,10 +109,17 @@ class Player(pygame.sprite.Sprite):
 
         for rects in walls_group:
             vector = Vector2(self.pos + self.vel)
-            if rects.rect.collidepoint(vector.x, self.pos.y):
-                col_dir.x = 0
-            if rects.rect.collidepoint(self.pos.x, vector.y):
-                col_dir.y = 0
+            if isinstance(rects, Wall):
+                if rects.rect.collidepoint(vector.x, self.pos.y):
+                    if not rects.can_cross:
+                        col_dir.x = 0
+                if rects.rect.collidepoint(self.pos.x, vector.y):
+                    if not rects.can_cross:
+                        col_dir.y = 0
+                if rects.can_cross and rects.rect.collidepoint(vector):
+                    angle_between = (math.atan2(self.pos.x - rects.pos.x, rects.pos.y - self.pos.y) + 360) % 360
+                    ray = Ray(self.game)
+                    ray.ray_cast(self.pos, angle_between, 0, 0, True)
             self.col_vector = Vector2(col_dir)
 
     def mouse_control(self):

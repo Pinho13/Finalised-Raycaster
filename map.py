@@ -50,14 +50,15 @@ class Map:
     def build_map(self):
         for cord in self.wall_cords:
             if self.wall_cords[cord] < 10:
-                walls_group.add(Wall(cord_to_pos(cord), "white"))
+                walls_group.add(Wall(cord_to_pos(cord), "white", False))
             else:
-                walls_group.add(Wall(cord_to_pos(cord), "black"))
+                walls_group.add(Wall(cord_to_pos(cord), "black", True))
 
 
 class Wall(pygame.sprite.Sprite):
-    def __init__(self, pos, color):
+    def __init__(self, pos, color, can_cross):
         super().__init__()
+        self.can_cross = can_cross
         self.pos = pos
         self.size = (WALL_SIZE, WALL_SIZE)
         self.image = pygame.Surface(self.size)

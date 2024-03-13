@@ -33,7 +33,7 @@ class Ray:
         self.hit_point = Vector2(0, 0)
         self.portals_passed = 0
 
-    def ray_cast(self, pos, angle, additional_depth = 0, alpha = 0):
+    def ray_cast(self, pos, angle, additional_depth = 0, alpha = 0, tp = False):
         ox, oy = pos/map.WALL_SIZE
         sin_a = math.sin(angle)
         cos_a = math.cos(angle)
@@ -105,8 +105,8 @@ class Ray:
         self.hit_point = Vector2(ox + self.depth * cos_a, oy + self.depth * sin_a) * map.WALL_SIZE#Interceção
         self.proj_height = SCREEN_DIST / (self.depth + 0.0001)#Altura
         self.color_value = 255 / (1 + (abs(self.depth) ** 1) * 0.03)#Cor
-        if DIMENSION == 2:
-            pygame.draw.line(self.game.screen, 'orange', (pos.x, pos.y), (pos.x + 100 * self.depth * cos_a, pos.y + 100 * self.depth * sin_a), 2)
+        #if DIMENSION == 2:
+            #pygame.draw.line(self.game.screen, 'orange', (pos.x, pos.y), (pos.x + 100 * self.depth * cos_a, pos.y + 100 * self.depth * sin_a), 2)
         if texture >= 20 and self.portals_passed <= 250:
             wall_pos = cord_to_pos(wall_pos)
             point = Vector2(self.hit_point - wall_pos)
@@ -115,12 +115,14 @@ class Ray:
             else:
                 portal_offset = -point.y
             self.portals_passed += 1
-            self.portal(texture, angle, portal_offset, wall_angle, alpha, symmetry)
+            self.portal(texture, angle, portal_offset, wall_angle, alpha, symmetry, self.hit_point, self.portals_passed, tp)
         if texture < 20:
             self.portals_passed = 0
 
+
+
     #https://www.cs.rpi.edu/~cutler/classes/advancedgraphics/S19/final_projects/max_sol.pdf
-    def portal(self, num, angle, point, wall_angle, alpha, symmetry):
+    def portal(self, num, angle, point, wall_angle, alpha, symmetry, hit_point, portals_passed = 0, tp = False):
         map_walls = self.game.map.wall_cords
         for i in map_walls:
             if map_walls[i] >= 20:
@@ -136,18 +138,27 @@ class Ray:
                 self.ray_cast(wall_pos + Vector2(map.WALL_SIZE/2, -point * symmetry), alpha_angle, self.depth, alpha)
                 if DIMENSION == 2:
                     pygame.draw.circle(self.game.screen, (200, 200, 200), wall_pos + Vector2(map.WALL_SIZE/2, point * symmetry), 4)
+                if tp:
+                    self.game.player.pos = wall_pos + Vector2(5 + map.WALL_SIZE/2, -point * symmetry)
+                    self.game.player.angle = math.degrees(alpha_angle)
             case "3":
                 self.ray_cast(wall_pos + Vector2(-map.WALL_SIZE/2, point * symmetry), alpha_angle + math.radians(180), self.depth, alpha)
                 if DIMENSION == 2:
                     pygame.draw.circle(self.game.screen, (200, 200, 200), wall_pos + Vector2(-map.WALL_SIZE/2, point * symmetry), 4)
+                if tp:
+                    self.game.player.pos = wall_pos + Vector2(-5-map.WALL_SIZE/2, point * symmetry)
+                    self.game.player.angle = math.degrees(alpha_angle + math.radians(180))
             case "4":
                 self.ray_cast(wall_pos + Vector2(point * symmetry, map.WALL_SIZE/2), alpha_angle + math.radians(270), self.depth, alpha)
                 if DIMENSION == 2:
                     pygame.draw.circle(self.game.screen, (200, 200, 200), wall_pos + Vector2(point * symmetry, map.WALL_SIZE/2), 4)
+                if tp:
+                    self.game.player.pos = wall_pos + Vector2(point * symmetry, 5 + map.WALL_SIZE/2)
+                    self.game.player.angle = math.degrees(alpha_angle + math.radians(270))
             case "5":
                 self.ray_cast(wall_pos + Vector2(point * symmetry, -map.WALL_SIZE/2), -alpha_angle - math.radians(90) * symmetry, self.depth, alpha)
                 if DIMENSION == 2:
                     pygame.draw.circle(self.game.screen, (200, 200, 200), wall_pos + Vector2(point * symmetry, -map.WALL_SIZE/2), 4)
-
-
-
+                if tp:
+                    self.game.player.pos = wall_pos + Vector2(point * symmetry, -5-map.WALL_SIZE/2)
+                    self.game.player.angle = math.degrees(alpha_angle - math.radians(90) * symmetry)
