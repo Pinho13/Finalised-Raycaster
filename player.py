@@ -159,5 +159,10 @@ class Player(pygame.sprite.Sprite):
 
     def draw_vision(self):
         for i in range(NUM_RAYS):
-            pygame.draw.rect(self.game.screen, (self.rays[i].color_value, self.rays[i].color_value, self.rays[i].color_value),(i * SCALE, HALF_HEIGHT - self.rays[i].proj_height // 2, SCALE, self.rays[i].proj_height))
+            if self.rays[i].texture == 1:
+                pygame.draw.rect(self.game.screen, (255 * self.rays[i].color_value, 255 * self.rays[i].color_value, 255 * self.rays[i].color_value), (i * SCALE, HALF_HEIGHT - self.rays[i].proj_height // 2, SCALE,self.rays[i].proj_height))
+            elif self.rays[i].texture == 2:
+                pygame.draw.rect(self.game.screen, (255* self.rays[i].color_value, 0* self.rays[i].color_value, 0* self.rays[i].color_value),(i * SCALE, HALF_HEIGHT - self.rays[i].proj_height // 2, SCALE, self.rays[i].proj_height))
+            elif self.rays[i].texture == 3:
+                pygame.draw.rect(self.game.screen, (0* self.rays[i].color_value, 0* self.rays[i].color_value, 255* self.rays[i].color_value),(i * SCALE, HALF_HEIGHT - self.rays[i].proj_height // 2, SCALE, self.rays[i].proj_height))
 
