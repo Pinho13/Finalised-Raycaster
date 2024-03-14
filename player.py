@@ -38,6 +38,7 @@ class Player(pygame.sprite.Sprite):
 
         #Rays
         self.rays = []
+        self.ray = Ray(self.game)
         for i in range(NUM_RAYS):
             self.rays.append(Ray(game))
     def update(self):
@@ -51,6 +52,7 @@ class Player(pygame.sprite.Sprite):
 
     def movement(self):
         self.vel = self.dir * PLAYER_SPEED * self.game.delta_time
+        self.check_for_portal()
         self.pos += Vector2(self.vel.x * self.col_vector.x, self.vel.y * self.col_vector.y)
 
     def direction(self):
@@ -116,11 +118,22 @@ class Player(pygame.sprite.Sprite):
                 if rects.rect.collidepoint(self.pos.x, vector.y):
                     if not rects.can_cross:
                         col_dir.y = 0
-                if rects.can_cross and rects.rect.collidepoint(vector):
-                    angle_between = (math.atan2(self.pos.x - rects.pos.x, rects.pos.y - self.pos.y) + 360) % 360
-                    ray = Ray(self.game)
-                    ray.ray_cast(self.pos, angle_between, 0, 0, True)
+                #if rects.can_cross and rects.rect.collidepoint(vector):
+                    #math.atan2(self.pos.x - rects.pos.x, rects.pos.y - self.pos.y)
+                    #if self.vel != Vector2(0, 0):
+                    #    vel = self.vel.normalize()
+                    #    angle_between = math.atan2(vel.y, vel.x)
+                    #else:
+                    #    angle_between = math.atan2(self.pos.x - rects.pos.x, rects.pos.y - self.pos.y)
+                    #ray = Ray(self.game)
+                    #ray.ray_cast(self.pos, angle_between, 0, 0, True)
             self.col_vector = Vector2(col_dir)
+
+    def check_for_portal(self):
+        if self.vel != Vector2(0, 0):
+            vel = self.vel.normalize()
+            angle_between = math.atan2(vel.y, vel.x)
+            self.ray.ray_cast(self.pos, angle_between, 0, 0, True)
 
     def mouse_control(self):
         mx, my = pygame.mouse.get_pos()
@@ -140,7 +153,7 @@ class Player(pygame.sprite.Sprite):
 
     def draw_player(self):
         pygame.draw.circle(self.game.screen, (200, 200, 200), self.pos, 20)
-        #pygame.draw.line(self.game.screen, 'yellow', (self.pos.x, self.pos.y), Vector2(math.cos(self.rad_angle), math.sin(self.rad_angle)) * WALL_SIZE + self.pos, 2)
+        pygame.draw.line(self.game.screen, 'yellow', (self.pos.x, self.pos.y), Vector2(math.cos(self.rad_angle), math.sin(self.rad_angle)) * WALL_SIZE + self.pos, 2)
         #for i in range(NUM_RAYS):
         #    pygame.draw.line(self.game.screen, 'orange', (self.pos.x, self.pos.y), self.lines_pos[i], 2)
 
