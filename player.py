@@ -34,13 +34,21 @@ class Player(pygame.sprite.Sprite):
             self.lines_pos = []
             for i in range(NUM_RAYS):
                 self.lines_pos.append(Vector2(0, 0))
-        # -----------#
+        #------------#
 
         #Rays
         self.rays = []
         self.ray = Ray(self.game)
         for i in range(NUM_RAYS):
             self.rays.append(Ray(game))
+        #------------#
+
+        #Rendering
+        self.objects_to_render = []
+        self.ray_casting_result = []
+        self.textures = self.game.renderer.wall_textures
+        # ------------#
+
     def update(self):
         self.key = pygame.key.get_pressed()
         self.direction()
@@ -49,6 +57,7 @@ class Player(pygame.sprite.Sprite):
         self.check_wall()
         self.mouse_control()
         self.ray_casting()
+        self.get_objects_to_render()
 
     def movement(self):
         self.vel = self.dir * PLAYER_SPEED * self.game.delta_time
@@ -144,12 +153,45 @@ class Player(pygame.sprite.Sprite):
         self.angle += self.rel * MOUSE_SENSITIVITY * self.game.delta_time
 
     def ray_casting(self):
+        self.ray_casting_result = []
         angle = self.rad_angle - HALF_FOV + 0.0001
         for i in range(NUM_RAYS):
             self.rays[i].ray_cast(self.pos, angle, 0, angle - self.rad_angle)
             if DIMENSION == 2:
                 self.lines_pos[i] = self.rays[i].hit_point
+            else:
+                self.ray_casting_result.append((self.rays[i].depth, self.rays[i].proj_height, self.rays[i].texture, self.rays[i].offset, 255 * self.rays[i].color_value))
             angle += DELTA_ANGLE
+
+    def get_objects_to_render(self):
+        self.objects_to_render = []
+        for ray, values in enumerate(self.ray_casting_result):
+            depth, proj_height, texture, offset, color_value = values
+            if texture in self.textures:
+                if proj_height < HEIGHT:
+                    wall_column = self.textures[texture].subsurface(
+                        offset * (TEXTURE_SIZE - SCALE), 0, SCALE, TEXTURE_SIZE
+                    )
+                    wall_column = pygame.transform.scale(wall_column, (abs(SCALE), abs(proj_height)))
+                    wall_pos = (ray * SCALE, HALF_HEIGHT - proj_height // 2)
+                else:
+                    texture_height = TEXTURE_SIZE * HEIGHT / proj_height
+                    wall_column = self.textures[texture].subsurface(
+                        offset * (TEXTURE_SIZE - SCALE), HALF_TEXTURE_SIZE - texture_height // 2,
+                        SCALE, texture_height
+                    )
+                    wall_column = pygame.transform.scale(wall_column, (SCALE, HEIGHT))
+                    wall_pos = (ray * SCALE, 0)
+                wall_column.fill((color_value, color_value, color_value), special_flags=pygame.BLEND_RGBA_MULT)
+                self.objects_to_render.append((depth, wall_column, wall_pos))
+            else:
+                if texture == 1:
+                    pygame.draw.rect(self.game.screen, (color_value, color_value, color_value), (ray * SCALE, HALF_HEIGHT - proj_height // 2, SCALE,proj_height))
+                elif texture == 2:
+                    pygame.draw.rect(self.game.screen, (color_value, 0, 0), (ray * SCALE, HALF_HEIGHT - proj_height // 2, SCALE, proj_height))
+                elif texture == 3:
+                    pygame.draw.rect(self.game.screen, (0, 0, color_value), (ray * SCALE, HALF_HEIGHT - proj_height // 2, SCALE, proj_height))
+
 
     def draw_player(self):
         pygame.draw.circle(self.game.screen, (200, 200, 200), self.pos, 20)
@@ -157,12 +199,4 @@ class Player(pygame.sprite.Sprite):
         #for i in range(NUM_RAYS):
         #    pygame.draw.line(self.game.screen, 'orange', (self.pos.x, self.pos.y), self.lines_pos[i], 2)
 
-    def draw_vision(self):
-        for i in range(NUM_RAYS):
-            if self.rays[i].texture == 1:
-                pygame.draw.rect(self.game.screen, (255 * self.rays[i].color_value, 255 * self.rays[i].color_value, 255 * self.rays[i].color_value), (i * SCALE, HALF_HEIGHT - self.rays[i].proj_height // 2, SCALE,self.rays[i].proj_height))
-            elif self.rays[i].texture == 2:
-                pygame.draw.rect(self.game.screen, (255* self.rays[i].color_value, 0* self.rays[i].color_value, 0* self.rays[i].color_value),(i * SCALE, HALF_HEIGHT - self.rays[i].proj_height // 2, SCALE, self.rays[i].proj_height))
-            elif self.rays[i].texture == 3:
-                pygame.draw.rect(self.game.screen, (0* self.rays[i].color_value, 0* self.rays[i].color_value, 255* self.rays[i].color_value),(i * SCALE, HALF_HEIGHT - self.rays[i].proj_height // 2, SCALE, self.rays[i].proj_height))
 

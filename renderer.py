@@ -3,25 +3,27 @@ import pygame
 from settings import *
 
 
-def get_objects_to_render(ray_casting_result, textures):
-    objects_to_render = []
-    for ray, values in enumerate(ray_casting_result):
-        depth, proj_height, texture, offset = values
+class ObjectRenderer:
+    def __init__(self, game):
+        self.game = game
+        self.screen = game.screen
+        self.wall_textures = self.load_wall_textures()
 
-        if proj_height < HEIGHT:
-            wall_column = textures[texture].subsurface(
-                offset * (TEXTURE_SIZE - SCALE), 0, SCALE, TEXTURE_SIZE
-            )
-            wall_column = pygame.transform.scale(wall_column, (SCALE, proj_height))
-            wall_pos = (ray * SCALE, HALF_HEIGHT - proj_height // 2)
-        else:
-            texture_height = TEXTURE_SIZE * HEIGHT / proj_height
-            wall_column = textures[texture].subsurface(
-                offset * (TEXTURE_SIZE - SCALE), HALF_TEXTURE_SIZE - texture_height // 2,
-                SCALE, texture_height
-            )
-            wall_column = pygame.transform.scale(wall_column, (SCALE, HEIGHT))
-            wall_pos = (ray * SCALE, 0)
+    def draw(self):
+        self.render_game_objects()
 
-        objects_to_render.append((depth, wall_column, wall_pos))
-    return objects_to_render
+    def render_game_objects(self):
+        list_objects = sorted(self.game.player.objects_to_render, key=lambda t: t[0], reverse=True)
+        for depth, image, pos in list_objects:
+            self.screen.blit(image, pos)
+
+    @staticmethod
+    def get_texture(path, res=(TEXTURE_SIZE, TEXTURE_SIZE)):
+        texture = pygame.image.load(path).convert_alpha()
+        return pygame.transform.scale(texture, res)
+
+    def load_wall_textures(self):
+        return {
+            4: self.get_texture('Castlewall_01.png'),
+            #2: self.get_texture(''),
+        }

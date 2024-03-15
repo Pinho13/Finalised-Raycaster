@@ -11,11 +11,10 @@ class Game:
         self.screen = pygame.display.set_mode(RES)
         pygame.display.set_caption("Map Builder")
         self.grid = []
-        self.number_of_cells = 25
+        self.number_of_cells = 16
         self.cell_size = WIDTH/self.number_of_cells
         self.sprites = pygame.sprite.Group()
         self.build_grid()
-        self.get_map()
 
 
     @staticmethod
@@ -29,6 +28,8 @@ class Game:
         self.screen.fill("black")
         self.place_walls()
         self.draw()
+        if pygame.key.get_pressed()[pygame.K_RETURN]:
+            self.get_map()
         pygame.display.update()
 
     def build_grid(self):
@@ -56,16 +57,20 @@ class Game:
 
     def get_map(self):
         cell_size = self.cell_size
+        num_to_fill = input("Number to fill:")
         print("[")
         for j in range(self.number_of_cells):
             str = "["
             for i in range(self.number_of_cells):
+                found = False
                 for spr in self.sprites:
                     if isinstance(spr, Wall) and spr.pos == (j * cell_size + cell_size/2, i * cell_size + cell_size/2):
-                        str += "1, "
-
-                str += "0, "
-            str += "]"
+                        str += num_to_fill + ", "
+                        found = True
+                if not found:
+                    str += "0, "
+            str = str[:-2]
+            str += "],"
             print(str)
         print("]")
 

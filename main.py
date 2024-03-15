@@ -5,6 +5,7 @@ from settings import *
 from map import *
 from tools import *
 from player import *
+from renderer import *
 
 
 class Game:
@@ -19,6 +20,7 @@ class Game:
 
     def game_initializer(self):
         self.map = Map(self)
+        self.renderer = ObjectRenderer(self)
         self.player = Player(self)
 
     @staticmethod
@@ -40,7 +42,7 @@ class Game:
                 walls_group.draw(self.screen)
                 self.player.draw_player()
             case 3:
-                self.player.draw_vision()
+                self.renderer.draw()
 
     def control_game(self):
         self.clock.tick(FPS)
