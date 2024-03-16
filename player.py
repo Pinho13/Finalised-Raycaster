@@ -30,10 +30,9 @@ class Player(pygame.sprite.Sprite):
         #-----------#
 
         #Create FOV Lines
-        if DIMENSION == 2:
-            self.lines_pos = []
-            for i in range(NUM_RAYS):
-                self.lines_pos.append(Vector2(0, 0))
+        self.lines_pos = []
+        for i in range(NUM_RAYS):
+            self.lines_pos.append(Vector2(0, 0))
         #------------#
 
         #Rays
@@ -157,7 +156,7 @@ class Player(pygame.sprite.Sprite):
         angle = self.rad_angle - HALF_FOV + 0.0001
         for i in range(NUM_RAYS):
             self.rays[i].ray_cast(self.pos, angle, 0, angle - self.rad_angle)
-            if DIMENSION == 2:
+            if self.game.dimension == 2:
                 self.lines_pos[i] = self.rays[i].hit_point
             else:
                 self.ray_casting_result.append((self.rays[i].depth, self.rays[i].proj_height, self.rays[i].texture, self.rays[i].offset, 255 * self.rays[i].color_value))
@@ -198,5 +197,4 @@ class Player(pygame.sprite.Sprite):
         pygame.draw.line(self.game.screen, 'yellow', (self.pos.x, self.pos.y), Vector2(math.cos(self.rad_angle), math.sin(self.rad_angle)) * WALL_SIZE + self.pos, 2)
         #for i in range(NUM_RAYS):
         #    pygame.draw.line(self.game.screen, 'orange', (self.pos.x, self.pos.y), self.lines_pos[i], 2)
-
 

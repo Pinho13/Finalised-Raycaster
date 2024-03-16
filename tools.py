@@ -98,15 +98,15 @@ class Ray:
                 symmetry = -1
             portal_offset = "x"
         self.texture = texture
-        if DIMENSION == 3:
+        if self.game.dimension == 3:
             self.depth += additional_depth
         no_fish_depth = self.depth * math.cos(-alpha)  # Correção do efeito fishbowl
-        if DIMENSION == 3:
+        if self.game.dimension == 3:
             self.depth = no_fish_depth
         self.hit_point = Vector2(ox + self.depth * cos_a, oy + self.depth * sin_a) * map.WALL_SIZE#Interceção
         self.proj_height = SCREEN_DIST / (self.depth + 0.0001)#Altura
         self.color_value = 1 / (1 + (abs(self.depth) ** 2) * 0.03)#Cor
-        if DIMENSION == 2:
+        if self.game.dimension == 2:
             pygame.draw.line(self.game.screen, 'orange', (pos.x, pos.y), (pos.x + 100 * self.depth * cos_a, pos.y + 100 * self.depth * sin_a), 2)
         if texture >= 20 and self.portals_passed <= 250:
             wall_pos = cord_to_pos(wall_pos)

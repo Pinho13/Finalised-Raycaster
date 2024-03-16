@@ -24,6 +24,6 @@ class ObjectRenderer:
 
     def load_wall_textures(self):
         return {
-            4: self.get_texture('Castlewall_01.png'),
+            4: self.get_texture('Castlewall_01_medium.png'),
             #2: self.get_texture(''),
         }

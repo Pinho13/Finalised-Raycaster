@@ -149,7 +149,7 @@ WALL_SIZE = 100
 
 
 class Map:
-    def __init__(self, game):
+    def __init__(self, game, renderer):
         self.game = game
         self.grid = []
         self.map_struct = map_struct6
@@ -157,6 +157,7 @@ class Map:
         self.col = len(self.map_struct[0])
         self.wall_cords = {}
         self.wall_size = WALL_SIZE
+        self.renderer = renderer
         self.get_cords()
 
     def get_cords(self):
@@ -170,7 +171,10 @@ class Map:
     def build_map(self):
         for cord in self.wall_cords:
             if self.wall_cords[cord] < 10:
-                walls_group.add(Wall(cord_to_pos(cord), "white", False))
+                if self.wall_cords[cord] in self.game.renderer.wall_textures:
+                    walls_group.add(Wall(cord_to_pos(cord), "white", False, self.wall_cords[cord],self.renderer))
+                else:
+                    walls_group.add(Wall(cord_to_pos(cord), "white", False))
             else:
                 match str(self.wall_cords[cord])[0]:
                     case "2":
@@ -181,17 +185,21 @@ class Map:
                         color = "red"
                     case "5":
                         color = "yellow"
-                walls_group.add(Wall(cord_to_pos(cord), color, True))
 
 
 class Wall(pygame.sprite.Sprite):
-    def __init__(self, pos, color, can_cross):
+    def __init__(self, pos, color, can_cross, wall_type=0, renderer=None):
         super().__init__()
         self.can_cross = can_cross
         self.pos = pos
         self.size = (WALL_SIZE, WALL_SIZE)
-        self.image = pygame.Surface(self.size)
-        self.image.fill(color)
-        self.rect = self.image.get_rect(center=self.pos)
+        if wall_type == 0:
+            self.image = pygame.Surface(self.size)
+            self.image.fill(color)
+            self.rect = self.image.get_rect(center=self.pos)
+        else:
+            self.image = renderer.wall_textures[wall_type]
+            self.image = pygame.transform.scale(self.image, self.size)
+            self.rect = self.image.get_rect(center=self.pos)
         collision_objects.append(self.rect)
 
