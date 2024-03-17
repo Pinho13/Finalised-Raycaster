@@ -6,6 +6,7 @@ from map import *
 from tools import *
 from player import *
 from renderer import *
+from sprites import *
 
 
 class Game:
@@ -23,6 +24,7 @@ class Game:
         self.renderer = ObjectRenderer(self)
         self.map = Map(self, self.renderer)
         self.player = Player(self)
+        self.sprites = SpriteObject(self, pos=(WIDTH/2, HEIGHT/2 + 100))
 
     def check_events(self):
         for event in pygame.event.get():
@@ -36,6 +38,7 @@ class Game:
     def update(self):
         self.control_game()
         self.player.update()
+        self.sprites.update()
         pygame.display.update()
 
     def draw(self):

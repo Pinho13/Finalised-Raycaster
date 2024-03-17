@@ -42,10 +42,10 @@ class Ray:
         #Interceções horinzontais
 
         y_hor, dy = (map_y + 1, 1) if sin_a > 0 else (map_y - 1e-6, -1) #y_hor distância no y até a primeira interseção, dy direção (cima ou baixo)
-        depth_hor = (y_hor - oy) / sin_a #distãncia diagonal até a primeira interceção
+        depth_hor = (y_hor - oy) / sin_a + 0.00000001 #distãncia diagonal até a primeira interceção
 
         x_hor = ox + depth_hor * cos_a #x_hor distância no x até a primeira interseção
-        delta_depth = dy / sin_a #delta_depth interceção entre os pontos apos a primeira
+        delta_depth = dy / sin_a + 0.00000001#delta_depth interceção entre os pontos apos a primeira
         dx = delta_depth * cos_a #direção no x (esquerda, direita)
         #soma dos valores até se colidir com uma parede
         for i in range(MAX_DEPTH):
@@ -60,9 +60,9 @@ class Ray:
         #Interceções Verticais (tudo igual mas para as interceções com os eixos verticais)
         x_vert, dx = (map_x + 1, 1) if cos_a > 0 else (map_x - 1e-6, -1)
 
-        depth_vert = (x_vert - ox) / cos_a
+        depth_vert = (x_vert - ox) / cos_a + 0.00000001
         y_vert = oy + depth_vert * sin_a
-        delta_depth = dx / cos_a
+        delta_depth = dx / cos_a + 0.00000001
         dy = delta_depth * sin_a
 
         for i in range(MAX_DEPTH):
@@ -140,19 +140,19 @@ class Ray:
         match str(wall_num)[0]:
             case "2":
                 self.ray_cast(wall_pos + Vector2(map.WALL_SIZE/2, -point * symmetry), alpha_angle + 0.0001, self.depth, alpha)
-                if DIMENSION == 2:
+                if self.game.dimension == 2:
                     pygame.draw.circle(self.game.screen, (200, 200, 200), wall_pos + Vector2(map.WALL_SIZE/2, point * symmetry), 4)
             case "3":
                 self.ray_cast(wall_pos + Vector2(-map.WALL_SIZE/2, point * symmetry), alpha_angle + math.radians(180) + 0.0001, self.depth, alpha)
-                if DIMENSION == 2:
+                if self.game.dimension == 2:
                     pygame.draw.circle(self.game.screen, (200, 200, 200), wall_pos + Vector2(-map.WALL_SIZE/2, point * symmetry), 4)
             case "4":
                 self.ray_cast(wall_pos + Vector2(point * symmetry, map.WALL_SIZE/2), alpha_angle + math.radians(270) + 0.0001, self.depth, alpha)
-                if DIMENSION == 2:
+                if self.game.dimension == 2:
                     pygame.draw.circle(self.game.screen, (200, 200, 200), wall_pos + Vector2(point * symmetry, map.WALL_SIZE/2), 4)
             case "5":
                 self.ray_cast(wall_pos + Vector2(point * -symmetry, -map.WALL_SIZE/2), alpha_angle - math.radians(90) * symmetry + 0.0001, self.depth, alpha)
-                if DIMENSION == 2:
+                if self.game.dimension == 2:
                     pygame.draw.circle(self.game.screen, (200, 200, 200), wall_pos + Vector2(point * symmetry, -map.WALL_SIZE/2), 4)
 
     def portal_tp(self, num, angle, point, wall_angle, symmetry):
@@ -164,7 +164,6 @@ class Ray:
                     wall_num = map_walls[i]
 
         alpha_angle = angle - math.radians(wall_angle)
-        print()
         if wall_cords:
             wall_pos = Vector2(cord_to_pos(wall_cords))
         match str(wall_num)[0]:
