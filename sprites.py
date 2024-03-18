@@ -1,11 +1,12 @@
 import pygame
 
 from settings import *
+from map import *
 
 
 class SpriteObject:
     def __init__(self, game, path='Art/props/props1.png',
-                 pos=(WIDTH/2, HEIGHT/2), scale=0.5, shift=0):
+                 pos=(8, 4), scale=0.5, shift=0.75):
         self.game = game
         self.player = game.player
         self.x, self.y = pos
@@ -23,7 +24,7 @@ class SpriteObject:
         proj = SCREEN_DIST / self.norm_dist * self.SPRITE_SCALE
         proj_width, proj_height = proj * self.IMAGE_RATIO, proj
 
-        image = pygame.transform.scale(self.image, (proj_width*50, proj_height*50))
+        image = pygame.transform.scale(self.image, (proj_width, proj_height))
 
         self.sprite_half_width = proj_width // 2
         height_shift = proj_height * self.SPRITE_HEIGHT_SHIFT
@@ -31,8 +32,8 @@ class SpriteObject:
         self.game.player.objects_to_render.append((self.norm_dist, image, pos))
 
     def get_sprite(self):
-        dx = self.x - self.player.pos.x
-        dy = self.y - self.player.pos.y
+        dx = self.x - self.player.pos.x/WALL_SIZE
+        dy = self.y - self.player.pos.y/WALL_SIZE
         self.dx, self.dy = dx, dy
         self.theta = math.atan2(dy, dx)
 
@@ -52,4 +53,4 @@ class SpriteObject:
         if self.game.dimension == 3:
             self.get_sprite()
         else:
-            pygame.draw.circle(self.game.screen, "green", (self.x, self.y), 10)
+            pygame.draw.circle(self.game.screen, "green", (self.x * WALL_SIZE, self.y * WALL_SIZE), 10)

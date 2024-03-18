@@ -159,13 +159,13 @@ class Player(pygame.sprite.Sprite):
             if self.game.dimension == 2:
                 self.lines_pos[i] = self.rays[i].hit_point
             else:
-                self.ray_casting_result.append((self.rays[i].depth, self.rays[i].proj_height, self.rays[i].texture, self.rays[i].offset, 255 * self.rays[i].color_value))
+                self.ray_casting_result.append((self.rays[i].depth, self.rays[i].proj_height, self.rays[i].texture, self.rays[i].offset))
             angle += DELTA_ANGLE
 
     def get_objects_to_render(self):
         self.objects_to_render = []
         for ray, values in enumerate(self.ray_casting_result):
-            depth, proj_height, texture, offset, color_value = values
+            depth, proj_height, texture, offset = values
             if texture in self.textures:
                 if proj_height < HEIGHT:
                     wall_column = self.textures[texture].subsurface(
@@ -181,9 +181,9 @@ class Player(pygame.sprite.Sprite):
                     )
                     wall_column = pygame.transform.scale(wall_column, (SCALE, HEIGHT))
                     wall_pos = (ray * SCALE, 0)
-                wall_column.fill((color_value, color_value, color_value), special_flags=pygame.BLEND_RGBA_MULT)
                 self.objects_to_render.append((depth, wall_column, wall_pos))
             else:
+                color_value = 255 * (1 / (1 + (abs(depth) ** 2) * 0.03))
                 if texture == 1:
                     pygame.draw.rect(self.game.screen, (color_value, color_value, color_value), (ray * SCALE, HALF_HEIGHT - proj_height // 2, SCALE,proj_height))
                 elif texture == 2:

@@ -24,7 +24,7 @@ class Game:
         self.renderer = ObjectRenderer(self)
         self.map = Map(self, self.renderer)
         self.player = Player(self)
-        self.sprites = SpriteObject(self, pos=(WIDTH/2, HEIGHT/2 + 100))
+        self.sprites = SpriteObject(self, pos=(8, 1.5))
 
     def check_events(self):
         for event in pygame.event.get():

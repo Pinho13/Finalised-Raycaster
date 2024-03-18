@@ -15,6 +15,8 @@ class ObjectRenderer:
     def render_game_objects(self):
         list_objects = sorted(self.game.player.objects_to_render, key=lambda t: t[0], reverse=True)
         for depth, image, pos in list_objects:
+            color_value = 255 * (1 / (1 + (abs(depth) ** 2) * 0.03))
+            image.fill((color_value, color_value, color_value), special_flags=pygame.BLEND_RGBA_MULT)
             self.screen.blit(image, pos)
 
     @staticmethod

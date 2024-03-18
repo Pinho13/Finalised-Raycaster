@@ -29,7 +29,6 @@ class Ray:
         self.texture = 0
         self.offset = 0
         self.proj_height = 0
-        self.color_value = 0
         self.hit_point = Vector2(0, 0)
         self.portals_passed = 0
 
@@ -42,10 +41,10 @@ class Ray:
         #Interceções horinzontais
 
         y_hor, dy = (map_y + 1, 1) if sin_a > 0 else (map_y - 1e-6, -1) #y_hor distância no y até a primeira interseção, dy direção (cima ou baixo)
-        depth_hor = (y_hor - oy) / sin_a + 0.00000001 #distãncia diagonal até a primeira interceção
+        depth_hor = (y_hor - oy) / sin_a #distãncia diagonal até a primeira interceção
 
         x_hor = ox + depth_hor * cos_a #x_hor distância no x até a primeira interseção
-        delta_depth = dy / sin_a + 0.00000001#delta_depth interceção entre os pontos apos a primeira
+        delta_depth = dy / sin_a#delta_depth interceção entre os pontos apos a primeira
         dx = delta_depth * cos_a #direção no x (esquerda, direita)
         #soma dos valores até se colidir com uma parede
         for i in range(MAX_DEPTH):
@@ -60,9 +59,9 @@ class Ray:
         #Interceções Verticais (tudo igual mas para as interceções com os eixos verticais)
         x_vert, dx = (map_x + 1, 1) if cos_a > 0 else (map_x - 1e-6, -1)
 
-        depth_vert = (x_vert - ox) / cos_a + 0.00000001
+        depth_vert = (x_vert - ox) / cos_a
         y_vert = oy + depth_vert * sin_a
-        delta_depth = dx / cos_a + 0.00000001
+        delta_depth = dx / cos_a
         dy = delta_depth * sin_a
 
         for i in range(MAX_DEPTH):
@@ -105,7 +104,6 @@ class Ray:
             self.depth = no_fish_depth
         self.hit_point = Vector2(ox + self.depth * cos_a, oy + self.depth * sin_a) * map.WALL_SIZE#Interceção
         self.proj_height = SCREEN_DIST / (self.depth + 0.0001)#Altura
-        self.color_value = 1 / (1 + (abs(self.depth) ** 2) * 0.03)#Cor
         if self.game.dimension == 2:
             pygame.draw.line(self.game.screen, 'orange', (pos.x, pos.y), (pos.x + 100 * self.depth * cos_a, pos.y + 100 * self.depth * sin_a), 2)
         if texture >= 20 and self.portals_passed <= 250:
