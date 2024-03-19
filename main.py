@@ -23,12 +23,13 @@ class Game:
         self.game_initializer()
 
     def game_initializer(self):
+        self.sprites = []
         self.sound = Sound(self)
         self.dimension = DIMENSION
         self.renderer = ObjectRenderer(self)
         self.map = Map(self, self.renderer)
         self.player = Player(self)
-        self.sprites = SpriteObject(self, pos=(8, 1.5), rect_size=100)
+        self.sprites.append(SpriteObject(self, pos=(8, 1.5), rect_size=100))
         self.weapon = Weapon(self)
 
     def check_events(self):
@@ -43,7 +44,9 @@ class Game:
     def update(self):
         self.control_game()
         self.player.update()
-        self.sprites.update()
+        for sprite in self.sprites:
+            if isinstance(sprite, SpriteObject):
+                sprite.update()
         if self.weapon_active:
             self.weapon.update()
         pygame.display.update()
