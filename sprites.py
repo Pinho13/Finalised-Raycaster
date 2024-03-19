@@ -1,12 +1,14 @@
 import pygame
+import os
 
 from settings import *
 from map import *
+from tools import *
+from collections import deque
 
 
 class SpriteObject:
-    def __init__(self, game, path='Art/props/props1.png',
-                 pos=(8, 4), scale=0.5, shift=0.75):
+    def __init__(self, game, path='Art/props/props1.png', pos=(8, 4), scale=0.5, shift=0.5, rect_size=0):
         self.game = game
         self.player = game.player
         self.x, self.y = pos
@@ -19,6 +21,10 @@ class SpriteObject:
         self.sprite_half_width = 0
         self.SPRITE_SCALE = scale
         self.SPRITE_HEIGHT_SHIFT = shift
+        if rect_size > 0:
+            self.rect = pygame.Rect((0, 0), (rect_size, rect_size))
+            self.rect.center = (self.x * WALL_SIZE, self.y * WALL_SIZE)
+            collision_objects.append(self.rect)
 
     def get_sprite_projection(self):
         proj = SCREEN_DIST / self.norm_dist * self.SPRITE_SCALE
@@ -54,3 +60,48 @@ class SpriteObject:
             self.get_sprite()
         else:
             pygame.draw.circle(self.game.screen, "green", (self.x * WALL_SIZE, self.y * WALL_SIZE), 10)
+
+
+class Animator:
+    def __init__(self, path='Art/fullres/1.png', animation_time=120, loop=False):
+        self.animation_time = animation_time
+        self.path = path.rsplit('/', 1)[0]
+        self.frame_names = deque()
+        self.images = self.get_images(self.path)
+        self.animation_time_prev = pygame.time.get_ticks()
+        self.animation_trigger = False
+        self.playing = False
+        self.loop = loop
+        self.current_image = self.images[0]
+
+    def update(self):
+        if self.playing:
+            self.check_animation_time()
+            self.animate()
+
+    def animate(self):
+        if self.animation_trigger:
+            self.images.rotate(-1)
+            self.frame_names.rotate(-1)
+            self.current_image = self.images[0]
+            if self.frame_names[0] == "1":
+                if not self.loop:
+                    self.playing = False
+
+    def check_animation_time(self):
+        self.animation_trigger = False
+        time_now = pygame.time.get_ticks()
+        if time_now - self.animation_time_prev > self.animation_time:
+            self.animation_time_prev = time_now
+            self.animation_trigger = True
+
+    def get_images(self, path):
+        images = deque()
+        items = os.listdir(path)
+        for i in range(len(items)):
+            file_name = str(i + 1) + (".png")
+            if os.path.isfile(os.path.join(path, file_name)):
+                img = pygame.image.load(path + '/' + file_name).convert_alpha()
+                self.frame_names.append(file_name.rsplit(".", 1)[0])
+                images.append(img)
+        return images

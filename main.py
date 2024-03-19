@@ -7,6 +7,8 @@ from tools import *
 from player import *
 from renderer import *
 from sprites import *
+from weapon import *
+from sound import *
 
 
 class Game:
@@ -17,14 +19,17 @@ class Game:
         pygame.mouse.set_visible(False)
         self.delta_time = 0
         self.clock = pygame.Clock()
+        self.weapon_active = WEAPON_ACTIVE
         self.game_initializer()
 
     def game_initializer(self):
+        self.sound = Sound(self)
         self.dimension = DIMENSION
         self.renderer = ObjectRenderer(self)
         self.map = Map(self, self.renderer)
         self.player = Player(self)
-        self.sprites = SpriteObject(self, pos=(8, 1.5))
+        self.sprites = SpriteObject(self, pos=(8, 1.5), rect_size=100)
+        self.weapon = Weapon(self)
 
     def check_events(self):
         for event in pygame.event.get():
@@ -39,6 +44,8 @@ class Game:
         self.control_game()
         self.player.update()
         self.sprites.update()
+        if self.weapon_active:
+            self.weapon.update()
         pygame.display.update()
 
     def draw(self):
@@ -49,6 +56,8 @@ class Game:
                 self.player.draw_player()
             case 3:
                 self.renderer.draw()
+                if self.weapon_active:
+                    self.weapon.draw_weapon()
 
     def control_game(self):
         self.clock.tick(FPS)

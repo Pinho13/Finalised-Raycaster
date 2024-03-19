@@ -1,3 +1,5 @@
+import random
+
 import pygame
 import math
 
@@ -27,6 +29,7 @@ class Player(pygame.sprite.Sprite):
         self.game = game
         self.key = pygame.key.get_pressed()
         self.rel = 0
+        self.last_step = pygame.time.get_ticks()
         #-----------#
 
         #Create FOV Lines
@@ -57,6 +60,7 @@ class Player(pygame.sprite.Sprite):
         self.mouse_control()
         self.ray_casting()
         self.get_objects_to_render()
+        self.foot_steps()
 
     def movement(self):
         self.vel = self.dir * PLAYER_SPEED * self.game.delta_time
@@ -136,6 +140,13 @@ class Player(pygame.sprite.Sprite):
                     #ray = Ray(self.game)
                     #ray.ray_cast(self.pos, angle_between, 0, 0, True)
             self.col_vector = Vector2(col_dir)
+        for rects in collision_objects:
+            vector = Vector2(self.pos + self.vel)
+            if rects.collidepoint(vector.x, self.pos.y):
+                col_dir.x = 0
+            if rects.collidepoint(self.pos.x, vector.y):
+                col_dir.y = 0
+            self.col_vector = Vector2(col_dir)
 
     def check_for_portal(self):
         if self.vel != Vector2(0, 0):
@@ -198,3 +209,9 @@ class Player(pygame.sprite.Sprite):
         #for i in range(NUM_RAYS):
         #    pygame.draw.line(self.game.screen, 'orange', (self.pos.x, self.pos.y), self.lines_pos[i], 2)
 
+    def foot_steps(self):
+        time_now = pygame.time.get_ticks()
+        if self.dir != Vector2(0, 0):
+            if time_now - self.last_step > STEP_COOLDOWN_SOUND:
+                self.last_step = time_now
+                self.game.sound.steps[random.randint(0, len(self.game.sound.steps)-1)].play()
