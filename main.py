@@ -16,6 +16,8 @@ from sound import *
 #D - mover direita
 #A - mover esquerda
 #F - mudar entre 2d e 2.5d
+#M - desligar a música
+#Esc - sair do jogo
 
 class Game:
     def __init__(self):
@@ -35,7 +37,11 @@ class Game:
         self.renderer = ObjectRenderer(self)
         self.map = Map(self, self.renderer)
         self.player = Player(self)
-        self.sprites.append(SpriteObject(self, pos=(8, 1.5), rect_size=100))
+        #self.sprites.append(SpriteObject(self, pos=(8, 1.5), rect_size=100))
+        #self.sprites.append(SpriteObject(self,path= "Art/props/props2.png", pos=(10, 1.5), rect_size=100, shift=0.9))
+        #self.sprites.append(SpriteObject(self, path="Art/props/props3.png", pos=(3, 5), rect_size=100))
+        #self.sprites.append(SpriteObject(self, path="Art/props/props4.png", pos=(4, 8.5), rect_size=100))
+        #self.sprites.append(SpriteObject(self, path="Art/props/props5.png", pos=(7, 8.5), rect_size=100))
         self.weapon = Weapon(self)
 
     def check_events(self):
@@ -46,6 +52,14 @@ class Game:
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_f:
                     self.change_dimension()
+                if event.key == pygame.K_m:
+                    if pygame.mixer.music.get_volume() == 0:
+                        pygame.mixer.music.set_volume(0.15)
+                    else:
+                        pygame.mixer.music.set_volume(0)
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
 
     def update(self):
         self.control_game()

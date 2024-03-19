@@ -2,6 +2,7 @@ import pygame
 
 from settings import *
 
+
 class Sound:
     def __init__(self, game):
         self.game = game
