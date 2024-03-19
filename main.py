@@ -10,6 +10,12 @@ from sprites import *
 from weapon import *
 from sound import *
 
+#CONTROLOS
+#W - mover frente
+#S - mover trás
+#D - mover direita
+#A - mover esquerda
+#F - mudar entre 2d e 2.5d
 
 class Game:
     def __init__(self):
