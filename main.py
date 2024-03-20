@@ -9,6 +9,7 @@ from renderer import *
 from sprites import *
 from weapon import *
 from sound import *
+from enemy import *
 
 #CONTROLOS
 #W - mover frente
@@ -42,6 +43,7 @@ class Game:
         #self.sprites.append(SpriteObject(self, path="Art/props/props3.png", pos=(3, 5), rect_size=100))
         #self.sprites.append(SpriteObject(self, path="Art/props/props4.png", pos=(4, 8.5), rect_size=100))
         #self.sprites.append(SpriteObject(self, path="Art/props/props5.png", pos=(7, 8.5), rect_size=100))
+        self.enemy = Enemy(self, Vector2(1.2, 5))
         self.weapon = Weapon(self)
 
     def check_events(self):
@@ -64,6 +66,7 @@ class Game:
     def update(self):
         self.control_game()
         self.player.update()
+        self.enemy.update()
         for sprite in self.sprites:
             if isinstance(sprite, SpriteObject):
                 sprite.update()

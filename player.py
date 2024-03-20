@@ -202,7 +202,6 @@ class Player(pygame.sprite.Sprite):
                 elif texture == 3:
                     pygame.draw.rect(self.game.screen, (0, 0, color_value), (ray * SCALE, HALF_HEIGHT - proj_height // 2, SCALE, proj_height))
 
-
     def draw_player(self):
         pygame.draw.circle(self.game.screen, (200, 200, 200), self.pos, 20)
         pygame.draw.line(self.game.screen, 'yellow', (self.pos.x, self.pos.y), Vector2(math.cos(self.rad_angle), math.sin(self.rad_angle)) * WALL_SIZE + self.pos, 2)
